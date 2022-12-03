@@ -6,7 +6,6 @@ if __name__ == '__main__':
     window.geometry("800x600")
     window.maxsize(800, 600)
     window.minsize(800, 600)
-    Queue(window)
-    window.mainloop()
+    gui = Queue(window)
     
-#СДЕЛАЙ СУКА ВАЛИДАЦИЮ НЕГР ЕБАНЫЙ
+    

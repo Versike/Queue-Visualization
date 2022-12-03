@@ -1,6 +1,9 @@
 from tkinter import *
-import random
-from Kassa import Kassa
+from random import randint
+from Kassa import *
+import asyncio
+from async_tkinter_loop import async_handler, async_mainloop
+from defines import *
 
 class Queue:
     def __init__(self, root):
@@ -22,10 +25,13 @@ class Queue:
         self.queue_canvas = Canvas(self.window, width=self.canvasWidth, height=self.canvasHeight,bg="white", relief=RAISED, bd=10)
         self.queue_canvas.pack(fill=BOTH)
         
+        
         #Call functions
         self.entryLabels()
         self.makeButtons()
         self.kassaParameters()
+        
+        async_mainloop(self.window)
         
     #Labels for entry's elements
     def entryLabels(self):
@@ -38,12 +44,15 @@ class Queue:
         self.Persons = Label(self.window, text = "P", fg = "black")
         self.Persons.place(x=220, y=538)
         
+        self.arrivalPersons = Label(self.window, text = text_arrival_persons, fg = "black")
+        self.arrivalPersons.place(x=300, y = 538)
+        
     #Buttons settings    
     def makeButtons(self):
-        self.startQueues = Button(self.window, text = "Start", fg = "Green", command = self.initKasses)
+        self.startQueues = Button(self.window, text = "Start", fg = "Green", command = async_handler(self.arrPer))
         self.startQueues.place(x=30, y=535)
         
-        self.pauseQueues = Button(self.window, text = "Stop", fg = "red")
+        self.pauseQueues = Button(self.window, text = "Stop", fg = "red", command = async_handler(self.minusPer))
         self.pauseQueues.place(x=70, y=535)
     
     #Entry settings        
@@ -70,14 +79,27 @@ class Queue:
         kassaAmount = int(self.nKassaAmount.get())
         x = 20
         y = 0
-        self.kassaLabel = []
+        self.labelPersons = []
+        self.labelTimer = []
         self.kasses = []
-        for kassa in range(kassaAmount):
-            labelKassa = self.drawKassa(kassa, x, y)
-            self.kassaLabel.append(labelKassa)
-            t = self.tTimeComePersons.get()
-            p = self.pPersons.get()
-                        
-            obj = Kassa(tTimeComePersons = random.randint(1, int(t)), pPersons=random.randint(1, int(p)))
-            self.kasses.append(obj)
+        for kassaNumber in range(kassaAmount):
+            kassa = Kassa()
+            kassa.number = kassaNumber
+            self._lPersons = Label(self.queue_canvas, text = str(len(kassa.queue)))
+            self.labelPersons.append(self._lPersons)
+            self.kasses.append(kassa)
             x += 100
+    
+    async def arrPer(self): # delay done
+        while True:
+            delay = randint(1, int(self.tTimeComePersons.get()))
+            personarr = randint(1, int(self.pPersons.get()))
+            self.arrivalPersons["text"] = text_arrival_persons + str(self.QueuePersons)
+            self.QueuePersons += personarr
+            await asyncio.sleep(delay)
+    
+    async def minusPer(self):
+        var = int(self.QueuePersons - 3)
+        self.QueuePersons = var
+        
+    
