@@ -49,7 +49,7 @@ class Queue:
         
     #Buttons settings    
     def makeButtons(self):
-        self.startQueues = Button(self.window, text = "Start", fg = "Green", command = async_handler(self.arrPer))
+        self.startQueues = Button(self.window, text = "Start", fg = "Green", command = async_handler(self.initKasses))
         self.startQueues.place(x=30, y=535)
         
         self.pauseQueues = Button(self.window, text = "Stop", fg = "red", command = async_handler(self.minusPer))
@@ -75,25 +75,35 @@ class Queue:
         self.kassaQueuePersons.place(x = x, y = y + 20)
         
     #Main function to start queue
-    def initKasses(self):
+    async def initKasses(self):
         kassaAmount = int(self.nKassaAmount.get())
         x = 20
         y = 0
-        self.labelPersons = []
-        self.labelTimer = []
         self.kasses = []
+        
         for kassaNumber in range(kassaAmount):
             kassa = Kassa()
             kassa.number = kassaNumber
-            self._lPersons = Label(self.queue_canvas, text = str(len(kassa.queue)))
-            self.labelPersons.append(self._lPersons)
+            kassa.x = x
+            kassa.y = y
             self.kasses.append(kassa)
+            self.drawKassa(kassa.number, x , y)
             x += 100
-    
-    async def arrPer(self): # delay done
+            
+        await self.arrPer()
+            
+    def updatekasess(self):
+        kassaAmount = int(self.nKassaAmount.get())
+        
+        for kassaNumber in range(kassaAmount):
+            self.kasses[kassaNumber].queue =+ 1     
+        
+        
+        
+    async def arrPer(self): # delay and amount of persons DONE
         while True:
             delay = randint(1, int(self.tTimeComePersons.get()))
-            personarr = randint(1, int(self.pPersons.get()))
+            personarr = randint(0, int(self.pPersons.get()))
             self.arrivalPersons["text"] = text_arrival_persons + str(self.QueuePersons)
             self.QueuePersons += personarr
             await asyncio.sleep(delay)
