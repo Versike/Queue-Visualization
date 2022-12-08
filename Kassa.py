@@ -8,5 +8,5 @@ class Kassa():
         self.delay = []
         self.mean = 0
         self.countOfDelay = 0
-        self.tck1 = IntVar(value=1)
+        self.tck1 = IntVar(value=2)
         self.tck2 = IntVar(value=8)

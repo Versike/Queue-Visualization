@@ -152,10 +152,10 @@ class Queue(Frame):
             self.kassesTck2.append(tck2)
             self.lastXOfKassa = kassa.x
             x += 100
-        print(f'[+] Initialize kasses')
+        # print(f'[+] Initialize kasses')
         self.task_update = asyncio.ensure_future(self.updatekasess())
         self.task_stastus = asyncio.ensure_future(self.statusKasses())
-        print(f'[+] Start arrival peoples to Kasses by findMin()')
+        # print(f'[+] Start arrival peoples to Kasses by findMin()')
         if self.checkOfFirstRun is False:
             self.task_serving = asyncio.ensure_future(self.loopServing())
             
@@ -194,12 +194,12 @@ class Queue(Frame):
             for i in range(self.personarr):
                 kassa = self.findMin()
                 kassa.queue.append(i)
-                self.queue_canvas.create_window(kassa.x, kassa.y, window=self.kassesNameLabels[kassa.number])
+                # self.queue_canvas.create_window(kassa.x, kassa.y, window=self.kassesNameLabels[kassa.number])
                 self.kassesLabels[kassa.number]["text"] = str(len(kassa.queue))
-                self.queue_canvas.create_window(kassa.x, kassa.y+20, window=self.kassesLabels[kassa.number])
-                self.queue_canvas.create_window(kassa.x, kassa.y+80, window=self.kassesTck1[kassa.number])
-                self.queue_canvas.create_window(kassa.x, kassa.y+100, window=self.kassesTck2[kassa.number])
-                print(f'Касса {str(kassa.number)} имеет очередь {str(len(kassa.queue))}')
+                # self.queue_canvas.create_window(kassa.x, kassa.y+20, window=self.kassesLabels[kassa.number])
+                # self.queue_canvas.create_window(kassa.x, kassa.y+80, window=self.kassesTck1[kassa.number])
+                # self.queue_canvas.create_window(kassa.x, kassa.y+100, window=self.kassesTck2[kassa.number])
+                # print(f'Касса {str(kassa.number)} имеет очередь {str(len(kassa.queue))}')
                 await asyncio.sleep(0.01)
             self.personarr = 0
 
@@ -215,12 +215,12 @@ class Queue(Frame):
 
     async def servePeople(self, numberKassa):
         kassa = self.kasses
-        print(f'[+] Serving peoples {self.kassesTck2[numberKassa].get()}')
+        # print(f'[+] Serving peoples {self.kassesTck2[numberKassa].get()}')
         while True:
             # print(f'[servePeople] {numberKassa}')
             if kassa[numberKassa].queue:
                 delay = uniform(int(self.kassesTck1[numberKassa].get()), int(self.kassesTck2[numberKassa].get()))
-                print(f'[servePeople] {delay} сколько')
+                # print(f'[servePeople] {delay} сколько')
                 kassa[numberKassa].countOfDelay += 1
                 kassa[numberKassa].delay.append(delay)
                 kassa[numberKassa].mean = round(np.sum(kassa[numberKassa].delay)/kassa[numberKassa].countOfDelay, 2)
@@ -229,7 +229,7 @@ class Queue(Frame):
                 self.queue_canvas.create_window(kassa[numberKassa].x, kassa[numberKassa].y+40, window=self.kassesMean[numberKassa])
                 self.kassesLabels[numberKassa]["text"] = str(len(kassa[numberKassa].queue))
                 self.queue_canvas.create_window(kassa[numberKassa].x, kassa[numberKassa].y+20, window=self.kassesLabels[numberKassa])
-                print(f'Касса {kassa[numberKassa].number} обслужила. В очереди {len(kassa[numberKassa].queue)}')
+                # print(f'Касса {kassa[numberKassa].number} обслужила. В очереди {len(kassa[numberKassa].queue)}')
                 await asyncio.sleep(delay)
             await asyncio.sleep(0.01)
     
@@ -238,7 +238,7 @@ class Queue(Frame):
         for i in self.kasses[1:]:
             if len(i.queue) < len(r.queue):
                 r = i
-            if len(i.queue)==len(r.queue) or len(i.queue) == 0:
+            elif len(i.queue)==len(r.queue) or len(i.queue) == 0:
                 r=choice([i, r])
         return r
         
@@ -262,20 +262,20 @@ class Queue(Frame):
         self.task_update.cancel()
         self.task_stastus.cancel()
         self.kassaQueuePersons.master.destroy
-        print(f'[LOG] pauseProgram.self.kasses = {len(self.kasses)}')
+        # print(f'[LOG] pauseProgram.self.kasses = {len(self.kasses)}')
         for kassa in range(self.kassaAmount):
-            print(f'[LOG] Останвливаю кассу {kassa}')
+            # print(f'[LOG] Останвливаю кассу {kassa}')
             self.listOfTasksByKassa[kassa].cancel()        
         
     #ТУТ БОЛЬШАЯ СТРАШИЛКА ЗАПРЕЩАЮ ВАМ СМОТРЕТЬ ЧТО ТУТ ПРОИСХОДИТ Я ОБЪЯСНЯТЬ НЕ БУДУ. КУЧА ПРОВЕРОК НА КАЖДЫЙ ТАСК И АСИНХРОННЫЙ ВЫЗОВ. Я ЛУЧШЕ ВЫКИНУ ЗАЧЕТКУ
     async def resumeProgram(self):
         self.kassaAmount = int(self.nKassaAmount.get())
         temp = len(self.kasses)
-        print(f'[LOG] temp: {temp} and kassaAmount: {self.kassaAmount}')
+        # print(f'[LOG] temp: {temp} and kassaAmount: {self.kassaAmount}')
         if temp > self.kassaAmount:
             await self.pauseProgram()
             self.kassaAmount = int(self.nKassaAmount.get())
-            print(f'[LOG] Зашел в IF')
+            # print(f'[LOG] Зашел в IF')
             peopleOutKassa = []
             self.queue_canvas.delete("all")
             for kassa in range(self.kassaAmount, temp):
@@ -297,17 +297,21 @@ class Queue(Frame):
             self.task_update = asyncio.ensure_future(self.updatekasess())
             self.task_stastus = asyncio.ensure_future(self.statusKasses())
             for kassa in range(len(self.kasses)):
-                print(f'[LOG] Касса {self.kasses[kassa].number} очередь {len(self.kasses[kassa].queue)}')
+                # print(f'[LOG] Касса {self.kasses[kassa].number} очередь {len(self.kasses[kassa].queue)}')
+                self.queue_canvas.create_window(self.kasses[kassa].x, self.kasses[kassa].y, window=self.kassesNameLabels[self.kasses[kassa].number])
+                self.kassesLabels[self.kasses[kassa].number]["text"] = str(len(self.kasses[kassa].queue))
+                self.queue_canvas.create_window(self.kasses[kassa].x, self.kasses[kassa].y + 20, window=self.kassesLabels[self.kasses[kassa].number])
+                self.queue_canvas.create_window(self.kasses[kassa].x, self.kasses[kassa].y + 80, window=self.kassesTck1[self.kasses[kassa].number])
+                self.queue_canvas.create_window(self.kasses[kassa].x, self.kasses[kassa].y + 100, window=self.kassesTck2[self.kasses[kassa].number])
                 self.listOfTasksByKassa[kassa] = asyncio.ensure_future(self.servePeople(kassa))
-            print(f'[resumeProgram] Касс {len(self.kasses)} Таски {len(self.listOfTasksByKassa)}')
+            # print(f'[resumeProgram] Касс {len(self.kasses)} Таски {len(self.listOfTasksByKassa)}')
             
         if temp < self.kassaAmount:
             await self.addKasses()
             self.task_update = asyncio.ensure_future(self.updatekasess())
             self.task_stastus = asyncio.ensure_future(self.statusKasses())
-            print('asd')
             for kassa in range(temp, self.kassaAmount):
-                print(f'[+] Касса {kassa} была добавлена.')
+                # print(f'[+] Касса {kassa} была добавлена.')
                 self.listOfTasksByKassa.append(asyncio.ensure_future(self.servePeople(kassa)))
                 
         elif temp == self.kassaAmount:
@@ -322,7 +326,7 @@ class Queue(Frame):
         if len(self.kasses) > 0:
             self.checkOfFirstRun = True
             await self.resumeProgram()
-            print("[+] ВРУБАЙСЯ БРАТАН")
+            # print("[+] ВРУБАЙСЯ БРАТАН")
         else:
             await self.initKasses()
     
