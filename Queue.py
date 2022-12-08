@@ -95,6 +95,8 @@ class Queue:
         self.kassaQueuePersons.place(x = x, y = y + 20)
         self.serveMean = Label(self.queue_canvas, text = self.servePeopleMean, fg = "black")
         self.serveMean.place(x=x, y=y+40)
+        self.statuskassa = Label(self.queue_canvas, text = "status", fg = "black")
+        self.statuskassa.place(x=x, y=y+60)
         
     #Main function to start queue
     async def initKasses(self):
@@ -104,6 +106,7 @@ class Queue:
         self.kasses = []
         self.kassesLabels = []
         self.kassesMean = []
+        self.kassesStatus = []
         
         for kassaNumber in range(len(self.kasses), self.kassaAmount):
             kassa = Kassa()
@@ -116,6 +119,8 @@ class Queue:
             self.kassesLabels.append(label)
             mean = Label(self.queue_canvas, text = 0, fg = "black")
             self.kassesMean.append(mean)
+            status = Label(self.queue_canvas, text = "status", fg = "black")
+            self.kassesStatus.append(status)
             self.lastXOfKassa = kassa.x
             x += 100
         print(f'[+] Initialize kasses')
@@ -139,6 +144,8 @@ class Queue:
             self.kassesLabels.append(label)
             mean = Label(self.queue_canvas, text = 0, fg = "black")
             self.kassesMean.append(mean)
+            status = Label(self.queue_canvas, text = "status", fg = "black")
+            self.kassesStatus.append(status)
             self.lastXOfKassa = kas.x
             x += 100
 
@@ -150,7 +157,12 @@ class Queue:
             await asyncio.sleep(delay)
             for i in range(self.personarr):
                 kassa = self.findMin()
+                kassa2 = self.findMax()
                 kassa.queue.append(i)
+                self.kassesStatus[kassa.number]["text"] = "_Free_"
+                self.kassesStatus[kassa.number].place(x=kassa.x, y = kassa.y + 60)
+                self.kassesStatus[kassa2.number]["text"] = "_Busy_"
+                self.kassesStatus[kassa2.number].place(x=kassa.x, y = kassa.y + 60)
                 self.kassesLabels[kassa.number]["text"] = str(len(kassa.queue))
                 self.kassesLabels[kassa.number].place(x = kassa.x, y = kassa.y + 20)
                 print(f'Касса {str(kassa.number)} имеет очередь {str(len(kassa.queue))}')
@@ -164,14 +176,20 @@ class Queue:
             print(f'[servePeople] {numberKassa}')
             if kassa[numberKassa].queue and self.personarr > 0:
                 delay = uniform(1, 8)
-                self.kassesLabels[numberKassa]["text"] = str(len(kassa[numberKassa].queue))
-                self.kassesLabels[numberKassa].place(x=kassa[numberKassa].x, y=kassa[numberKassa].y + 20)
                 kassa[numberKassa].countOfDelay += 1
                 kassa[numberKassa].delay.append(delay)
                 kassa[numberKassa].mean = round(np.sum(kassa[numberKassa].delay)/kassa[numberKassa].countOfDelay, 2)
                 kassa[numberKassa].queue.pop(0)
+                kassa = self.findMin()
+                kassa2 = self.findMax()
+                self.kassesStatus[kassa.number]["text"] = "_Free_"
+                self.kassesStatus[kassa.number].place(x=kassa.x, y = kassa.y + 60)
+                self.kassesStatus[kassa2.number]["text"] = "_Busy_"
+                self.kassesStatus[kassa2.number].place(x=kassa.x, y = kassa.y + 60)
                 self.kassesMean[numberKassa]["text"] = str(kassa[numberKassa].mean)
                 self.kassesMean[numberKassa].place(x=kassa[numberKassa].x, y=kassa[numberKassa].y + 40)
+                self.kassesLabels[numberKassa]["text"] = str(len(kassa[numberKassa].queue))
+                self.kassesLabels[numberKassa].place(x=kassa[numberKassa].x, y=kassa[numberKassa].y + 20)
                 print(f'Касса {kassa[numberKassa].number} обслужила. В очереди {len(kassa[numberKassa].queue)}')
                 await asyncio.sleep(delay)
             await asyncio.sleep(0.01)
@@ -220,11 +238,18 @@ class Queue:
             peopleOutKassa = 0
             for kassa in range(self.kassaAmount, temp):
                 peopleOutKassa += len(self.kasses[temp-1].queue)
+                self.kassesLabels[kassa]["text"] = "-rm"
+                self.kassesLabels[kassa].place(x=self.kasses[kassa].x, y=20)
+                self.kassesMean[kassa]["text"] = "-rm"
+                self.kassesMean[kassa].place(x=self.kasses[kassa].x, y=40)
+                self.kassesStatus[kassa]["text"] = "-rm"
+                self.kassesStatus[kassa].place(x=self.kasses[kassa].x, y=60)
                 self.kasses.pop(temp-1)
                 self.kassesLabels.pop(temp-1)
                 self.kassesMean.pop(temp-1)
                 self.listOfTasksByKassa.pop(temp-1)
-                self.lastXOfKassa = self.kasses[kassa-1].x
+                self.lastXOfKassa = self.kasses[len(self.kasses)-1].x
+                
                 print(f'[-] Касса {kassa} была удалена. Удачи вам помучаться с з/п 15к в мес.')
                 temp -= 1
             for i in range(peopleOutKassa):
