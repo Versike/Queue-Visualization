@@ -4,8 +4,6 @@ class Kassa():
         self.queue = []
         self.x = 0
         self.y = 0
-        self.delay = 0
-        # self.IsActive = False
-        # self.intr = None
-        # self.mean = []
-        # self.countOfStart = None
+        self.delay = []
+        self.mean = 0
+        self.countOfDelay = 0
