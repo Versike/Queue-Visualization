@@ -156,8 +156,8 @@ class Queue:
             self.arrivalPersons["text"] = self.personarr
             await asyncio.sleep(delay)
             for i in range(self.personarr):
-                kassa = self.findMin()
-                kassa2 = self.findMax()
+                kassa = await self.findMin()
+                kassa2 = await self.findMax()
                 kassa.queue.append(i)
                 self.kassesStatus[kassa.number]["text"] = "_Free_"
                 self.kassesStatus[kassa.number].place(x=kassa.x, y = kassa.y + 60)
@@ -180,12 +180,6 @@ class Queue:
                 kassa[numberKassa].delay.append(delay)
                 kassa[numberKassa].mean = round(np.sum(kassa[numberKassa].delay)/kassa[numberKassa].countOfDelay, 2)
                 kassa[numberKassa].queue.pop(0)
-                kassa = self.findMin()
-                kassa2 = self.findMax()
-                self.kassesStatus[kassa.number]["text"] = "_Free_"
-                self.kassesStatus[kassa.number].place(x=kassa.x, y = kassa.y + 60)
-                self.kassesStatus[kassa2.number]["text"] = "_Busy_"
-                self.kassesStatus[kassa2.number].place(x=kassa.x, y = kassa.y + 60)
                 self.kassesMean[numberKassa]["text"] = str(kassa[numberKassa].mean)
                 self.kassesMean[numberKassa].place(x=kassa[numberKassa].x, y=kassa[numberKassa].y + 40)
                 self.kassesLabels[numberKassa]["text"] = str(len(kassa[numberKassa].queue))
@@ -194,21 +188,23 @@ class Queue:
                 await asyncio.sleep(delay)
             await asyncio.sleep(0.01)
     
-    def findMin(self): # return class Kassa
+    async def findMin(self): # return class Kassa
         r = self.kasses[0]
         for i in self.kasses[1:]:
             if len(i.queue) < len(r.queue):
                 r = i
             if len(i.queue)==len(r.queue) or len(i.queue) == 0:
                 r=choice([i, r])
+        await asyncio.sleep(0.1)
         return r
         
     # For find busy kassa   
-    def findMax(self):
+    async def findMax(self):
         r = self.kasses[0]
         for i in self.kasses[1:]:
             if len(i.queue) > len(r.queue):
                 r = i
+        await asyncio.sleep(0.1)
         return r
         
     async def loopServing(self):
